@@ -1,4 +1,5 @@
 import click
+
 from lib.repository import Repository
 
 
@@ -12,4 +13,4 @@ def destroy(single):
 
     # Destroy all repos
     else:
-        Repository().test_method()
+        Repository.update_repositories()

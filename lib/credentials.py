@@ -5,13 +5,14 @@ from .db_helper import DBHelper
 
 
 class Credentials:
-    def __init__(self, credentials_filepath: str = 'db/credentials.csv') -> None:
-        self.credentials_filepath = credentials_filepath
+    db_filepath = 'db/credentials.csv'
+
+    def __init__(self) -> None:
         self.username = None
         self.personal_access_token = None
 
     def credentials_db_exists(self) -> bool:
-        credential_file_exists = os.path.exists(self.credentials_filepath)
+        credential_file_exists = os.path.exists(Credentials.db_filepath)
         return credential_file_exists
 
     def display_credentials(self) -> None:
@@ -30,11 +31,11 @@ class Credentials:
         if click.confirm(prompt):
             username = click.prompt('Username')
             personal_access_token = click.prompt('Personal Access Token')
-            db_helper = DBHelper(self.credentials_filepath)
+            db_helper = DBHelper(Credentials.db_filepath)
             db_helper.write_credentials(username, personal_access_token)
 
     def read_credentials(self) -> None:
-        credentials = DBHelper(self.credentials_filepath).read_credentials()
+        credentials = DBHelper(Credentials.db_filepath).read_credentials()
         if credentials:
             self.username = credentials[0]
             self.personal_access_token = credentials[1]

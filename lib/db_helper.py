@@ -2,30 +2,30 @@ import csv
 import json
 import os.path
 
+from typing import List
+
 
 class DBHelper:
     def __init__(self, filename):
         self.filename = filename
 
-    def read_repositories(self):
-        with open('friends.json', 'r') as file:
-            file_contents = json.load(file)
+    def file_exists_and_not_empty(self):
+        return os.path.exists(self.filename) and os.stat(self.filename).st_size > 0
 
-        print(file_contents)
+    def write_repositories(self, repo_array):
+        with open(self.filename, 'w') as f:
+            f.writelines(repo_array)
 
-        cars = [
-            {'make': 'Ford', 'model': 'Fiesta'},
-            {'make': 'Ford', 'model': 'Focus'}
-        ]
-        with open('cars.json', 'w') as file:
-            json.dump(cars, file)
-        pass
-
-    # credential_file_exists = os.path.exists(self.credentials_filepath)
-    # return credential_file_exists
+    def read_repositories(self) -> List:
+        if self.file_exists_and_not_empty():
+            with open(self.filename, 'r') as f:
+                repo_array = [line.strip() for line in f.readlines()]
+                return repo_array
+        else:
+            return []
 
     def read_credentials(self):
-        if not os.path.exists(self.filename):
+        if not self.file_exists_and_not_empty():
             return False
 
         with open(self.filename, "r") as f:
