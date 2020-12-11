@@ -1,7 +1,7 @@
 import click
 import os.path
 
-from .csv_helper import CSVHelper
+from .db_helper import DBHelper
 
 
 class Credentials:
@@ -30,17 +30,14 @@ class Credentials:
         if click.confirm(prompt):
             username = click.prompt('Username')
             personal_access_token = click.prompt('Personal Access Token')
-            csv_helper = CSVHelper(self.credentials_filepath)
-            csv_helper.write_credentials(username, personal_access_token)
+            db_helper = DBHelper(self.credentials_filepath)
+            db_helper.write_credentials(username, personal_access_token)
 
     def read_credentials(self) -> None:
-        if self.credentials_db_exists():
-            credentials = CSVHelper(self.credentials_filepath).read_credentials()
-            if credentials:
-                self.username = credentials[0]
-                self.personal_access_token = credentials[1]
-                self.display_credentials()
-            else:
-                self.prompt_user_for_credentials(credentials_invalid=True)
+        credentials = DBHelper(self.credentials_filepath).read_credentials()
+        if credentials:
+            self.username = credentials[0]
+            self.personal_access_token = credentials[1]
+            self.display_credentials()
         else:
-            self.prompt_user_for_credentials()
+            self.prompt_user_for_credentials(credentials_invalid=True)

@@ -3,12 +3,13 @@ from lib.repository import Repository
 
 
 @click.command()
-@click.option('-r', '--repo', 'repository')
-def destroy(repository):
-    """Deletes a single repo"""
-    if repository:
-        repo = Repository('x', 'y', 'z')
+@click.option('-s', '--single', 'single')
+def destroy(single):
+    """Deletes single or multiple repositories"""
+    if single:
+        print(single)
+        repo = Repository('x', 'y')
 
     # Destroy all repos
     else:
-        Repository.delete_all()
+        Repository().test_method()
