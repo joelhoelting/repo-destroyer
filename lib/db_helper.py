@@ -1,5 +1,4 @@
 import csv
-import json
 import os.path
 
 from typing import List
