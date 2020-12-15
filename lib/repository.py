@@ -1,3 +1,5 @@
+import click
+
 from .request_helper import RequestHelper
 from .db_helper import DBHelper
 
@@ -9,23 +11,27 @@ class Repository:
     def __init__(self, name: str = None, url: str = None):
         self.slug = name
         self.url = url
-        Repository.update_repositories()
+
+    @classmethod
+    def check_repositories_db(cls):
+        db_helper = DBHelper(cls.db_filepath)
+        db_repositories = db_helper.read_repositories()
+        if db_repositories:
+            cls.all = db_repositories
+            return True
+        return False
 
     @classmethod
     def update_repositories(cls):
-        if not cls.all:
+        click.echo("db/repositories.txt is empty or doesn't exist")
+        if click.confirm('Fetch a list of your repositories from the Github API?'):
+            request_helper = RequestHelper('https://api.github.com/users/joelhoelting/repos?per_page=100')
+            fetched_repositories = request_helper.fetch_repos()
+
             db_helper = DBHelper(cls.db_filepath)
-            db_repositories = db_helper.read_repositories()
-
-            if not db_repositories:
-                request_helper = RequestHelper('https://api.github.com/users/joelhoelting/repos?per_page=100')
-                fetched_repositories = request_helper.request_to_json()
-
-                db_helper.write_repositories(Repository.parse_repositories(fetched_repositories))
-
-            cls.all = db_repositories or fetched_repositories
-        else:
-            print('list is full')
+            db_helper.write_repositories(Repository.parse_repositories(fetched_repositories))
+            cls.check_repositories_db()
+        return False
 
     @staticmethod
     def parse_repositories(repo_array):

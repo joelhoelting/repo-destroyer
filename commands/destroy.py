@@ -4,13 +4,15 @@ from lib.repository import Repository
 
 
 @click.command()
-@click.option('-s', '--single', 'single')
-def destroy(single):
+@click.option('-r', '--repo', 'repository')
+@click.option('-s', '--safe', 'safe', is_flag=True)
+def destroy(repository, safe):
     """Deletes single or multiple repositories"""
-    if single:
-        print(single)
+    if repository:
         repo = Repository('x', 'y')
 
+    elif safe:
+        print('safe')
     # Destroy all repos
     else:
-        Repository.update_repositories()
+        Repository.check_repositories_db() or Repository.update_repositories()
