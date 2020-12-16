@@ -13,4 +13,4 @@ entry_point.add_command(authenticate)
 entry_point.add_command(destroy)
 
 if __name__ == '__main__':
-    entry_point(['destroy'])
+    entry_point(['authenticate'])

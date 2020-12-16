@@ -5,26 +5,30 @@ import time
 
 from rich.console import Console
 
+from .db_helper import DBHelper
+
 
 class RequestHelper:
-    def __init__(self, url: str, method: str = "get", data: dict = None):
+    def __init__(self, url: str, method: str = "get", data: dict = None, token: str = None):
         self.url = url
         self.method = method
         self.data = data
+        self.token = token
 
     def request_to_json(self):
-        response = requests.request(self.method, url=self.url, data=self.data)
+        headers = {'Authorization': f"Bearer {self.token}"} if self.token else None
+        response = requests.request(method=self.method, url=self.url, headers=headers)
         response_to_json = response.json()
         return response_to_json
 
     def fetch_repos(self):
-        console = Console()
-        repositories = []
         next_page = 1
+        repositories = []
 
-        with console.status("[bold green]Fetching repositories from github...") as status:
+        console = Console()
+
+        with console.status("[bold green]Fetching repositories from github..."):
             response = requests.request(self.method, url=self.url, data=self.data)
-            print(response.json())
             repositories.extend(response.json())
             console.log(f"Successfully fetched repositories (1 - {len(repositories)})")
 
