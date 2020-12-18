@@ -1,9 +1,8 @@
 import click
+from typing import List
 
 from .request_helper import RequestHelper
 from .db_helper import DBHelper
-
-from typing import List
 
 
 class Repository:
@@ -14,7 +13,7 @@ class Repository:
         self.name = name
 
     @classmethod
-    def check_repositories_db(cls):
+    def repositories_db_exists(cls):
         db_helper = DBHelper()
         db_repositories = db_helper.read_repositories()
         if db_repositories:
@@ -26,6 +25,7 @@ class Repository:
     def update_repositories(cls) -> bool:
         click.echo("db/repositories.txt is empty or doesn't exist")
         if click.confirm('Fetch a list of your repositories from the Github API?'):
+            request_helper = RequestHelper(url=url_dict['list_repos'], token=self.personal_access_token)
             request_helper = RequestHelper('https://api.github.com/users/joelhoelting/repos?per_page=100')
             fetched_repositories = request_helper.fetch_repos()
 

@@ -8,6 +8,8 @@ from lib.repository import Repository
 @click.option('-s', '--safe', 'safe', is_flag=True)
 def destroy(repository, safe):
     """Deletes single or multiple repositories"""
+    if not Repository.repositories_db_exists():
+        Repository.update_repositories()
     if repository:
         repo = Repository('x', 'y')
 
