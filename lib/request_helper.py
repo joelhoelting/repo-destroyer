@@ -16,10 +16,13 @@ class RequestHelper:
         self.token = token
 
     def request_to_json(self):
-        headers = {'Authorization': f"Bearer {self.token}"} if self.token else None
-        response = requests.request(method=self.method, url=self.url, headers=headers)
-        response_to_json = response.json()
-        return response_to_json
+        try:
+            headers = {'Authorization': f"Bearer {self.token}"} if self.token else None
+            response = requests.request(method=self.method, url=self.url, headers=headers)
+            response_to_json = response.json()
+            return response, response_to_json
+        except requests.exceptions.RequestException as e:
+            raise SystemExit('Please check your connection:', e)
 
     def fetch_repos(self):
         next_page = 1
