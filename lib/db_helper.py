@@ -36,5 +36,5 @@ class DBHelper:
             writer.writerow({"username": username, "personal_access_token": personal_access_token})
 
     @staticmethod
-    def file_exists_and_not_empty(filename: str) -> bool:
-        return os.path.exists(filename) and os.stat(filename).st_size > 0
+    def file_exists_and_not_empty(filepath: str) -> bool:
+        return os.path.exists(filepath) and os.stat(filepath).st_size > 0

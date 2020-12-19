@@ -13,21 +13,11 @@ CredentialsType = TypeVar("CredentialsType", bound="Credentials")
 
 
 class Credentials:
-    db_filepath = 'db/credentials.csv'
-
     def __init__(self) -> None:
         self.username = None
         self.personal_access_token = None
         self.username_valid = False
         self.personal_access_token_valid = False
-
-    def display_credentials(self) -> None:
-        printed_credentials = f"Current credentials ({self.db_filepath}):\n\n" \
-                              f"Username: {self.username}\n" \
-                              f"Personal Access Token: {self.personal_access_token}" \
-                              f"\n"
-
-        click.echo(printed_credentials)
 
     def validate_credentials(self) -> CredentialsType:
         credentials = DBHelper().read_credentials()
@@ -48,27 +38,17 @@ class Credentials:
         return self
 
     def display_token_info(self):
-        printed_credentials = f"Current credentials ({self.db_filepath}):\n\n" \
-                              f"Username: {self.username or '<empty>'}\n" \
-                              f"Personal Access Token: {self.personal_access_token or '<empty>'}" \
-                              f"\n"
+        curr_username_str = self.username or '<empty>'
+        curr_token_str = self.personal_access_token or '<empty>'
+        username_valid_str = green_or_red_string(self.username_valid, 'valid', 'invalid')
+        personal_access_token_valid_str = green_or_red_string(self.personal_access_token_valid, 'valid', 'invalid')
 
-        click.echo(printed_credentials)
-
-        username_valid_string = green_or_red_string(self.username_valid, 'valid', 'invalid')
-        personal_access_token_valid_string = green_or_red_string(self.personal_access_token_valid, 'valid', 'invalid')
-
-        click.echo(f"Github username status: " + username_valid_string)
-        click.echo(f"Github personal access token status: " + personal_access_token_valid_string + "\n")
+        click.echo(f"Github username: {curr_username_str} ({username_valid_str})")
+        click.echo(f"Github token: {curr_token_str} ({personal_access_token_valid_str})\n")
 
         if not self.personal_access_token_valid:
             click.echo("1. Visit https://github.com/settings/tokens and create a token with 'delete_repo' scope.")
             click.echo("2. Provide your username and token in the prompt below: \n")
-
-    @staticmethod
-    def credentials_db_exists() -> bool:
-        credential_file_exists = os.path.exists(Credentials.db_filepath)
-        return credential_file_exists
 
     @staticmethod
     def prompt_user_for_credentials() -> None:
