@@ -26,7 +26,7 @@ class Credentials:
             self.personal_access_token = credentials[1]
 
             # check if username is valid
-            username_request_helper = RequestHelper(url=build_url('validate_user', self.username))
+            username_request_helper = RequestHelper(url=build_url('validate_user', username=self.username))
             response, json = username_request_helper.request_to_json()
             self.username_valid = response.status_code == 200
 
@@ -35,7 +35,10 @@ class Credentials:
             response, json = request_helper.request_to_json()
             self.personal_access_token_valid = response.status_code == 200
 
-        return self
+            if self.username_valid and self.personal_access_token_valid:
+                return True
+            
+        return False
 
     def display_token_info(self):
         curr_username_str = self.username or '<empty>'

@@ -4,6 +4,8 @@ from typing import List
 from .request_helper import RequestHelper
 from .db_helper import DBHelper
 
+from helpers.url_builder import build_url
+
 
 class Repository:
     all = []
@@ -22,17 +24,14 @@ class Repository:
         return False
 
     @classmethod
-    def update_repositories(cls) -> bool:
-        click.echo("db/repositories.txt is empty or doesn't exist")
-        if click.confirm('Fetch a list of your repositories from the Github API?'):
-            request_helper = RequestHelper(url=url_dict['list_repos'], token=self.personal_access_token)
-            request_helper = RequestHelper('https://api.github.com/users/joelhoelting/repos?per_page=100')
-            fetched_repositories = request_helper.fetch_repos()
+    def update_repositories(cls, username, token) -> bool:
+        request_helper = RequestHelper(url=build_url('list_repos', username=username), token=token)
+        fetched_repositories = request_helper.fetch_repos()
 
-            if fetched_repositories:
-                db_helper = DBHelper()
-                db_helper.write_repositories(Repository.parse_repositories(fetched_repositories))
-                cls.check_repositories_db()  # Returns true or false
+        if fetched_repositories:
+            db_helper = DBHelper()
+            db_helper.write_repositories(Repository.parse_repositories(fetched_repositories))
+            return cls.repositories_db_exists()  # Returns true or false
         return False
 
     @staticmethod

@@ -104,6 +104,7 @@ hs-zhw-shoes-layout-v-000
 hsp-full-site-next
 html-album-cover-v-000
 html-issue-bot-9000-v-000
+html-issue-bot-9000-v-000
 html-map-contact-form-code-along-v-000
 html5-semantic-containers-code-along-v-000
 html5-video-embed-code-along-v-000
