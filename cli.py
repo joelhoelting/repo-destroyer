@@ -15,4 +15,4 @@ entry_point.add_command(nuke)
 entry_point.add_command(fetch)
 
 if __name__ == '__main__':
-    entry_point(['fetch'])
+    entry_point(['authenticate'])

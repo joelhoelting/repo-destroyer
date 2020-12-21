@@ -25,7 +25,8 @@ class Repository:
 
     @classmethod
     def update_repositories(cls, username, token) -> bool:
-        request_helper = RequestHelper(url=build_url('list_repos', username=username), token=token)
+        request_helper = RequestHelper(url=build_url('list_repos', username=username), token=token,
+                                       rate_limit_verbose=True)
         fetched_repositories = request_helper.fetch_repos()
 
         if fetched_repositories:

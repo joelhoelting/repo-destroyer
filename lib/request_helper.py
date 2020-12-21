@@ -5,24 +5,36 @@ import time
 
 from rich.console import Console
 
-from .db_helper import DBHelper
-
 
 class RequestHelper:
-    def __init__(self, url: str, method: str = "get", data: dict = None, token: str = None):
+    def __init__(self, url: str, method: str = "get", data: dict = None, token: str = None,
+                 rate_limit_verbose: bool = False):
         self.url = url
         self.method = method
         self.data = data
         self.token = token
+        self.response = None
+        self.rate_limit_verbose = rate_limit_verbose
+        self.requests_limit = None
+        self.requests_remaining = None
+        self.requests_used = None
+        self.requests_reset = None
 
-    def request_to_json(self):
+    def make_request(self):
         try:
             headers = self.set_headers()
-            response = requests.request(method=self.method, url=self.url, headers=headers)
-            response_to_json = response.json()
-            return response, response_to_json
+            self.response = requests.request(method=self.method, url=self.url, headers=headers)
+            self.update_rate_limit_info()
+
+            if self.rate_limit_verbose:
+                self.display_rate_limit_info()
+
+            return self.response
         except requests.exceptions.RequestException as e:
             raise SystemExit('Please check your connection:', e)
+
+    def request_to_json(self):
+        return self.response.json()
 
     def fetch_repos(self):
         next_page = 1
@@ -32,41 +44,48 @@ class RequestHelper:
         headers = self.set_headers()
 
         with console.status("[bold green]Fetching repositories from github..."):
-            response = requests.request(self.method, url=self.url, headers=headers)
-            repositories.extend(response.json())
+            self.response = requests.request(self.method, url=self.url, headers=headers)
+            self.update_rate_limit_info()
+            repositories.extend(self.response.json())
             console.log(f"Success - Fetched Repositories (1 - {len(repositories)})")
 
-        if 'link' in response.headers:
+        if 'link' in self.response.headers:
             next_page += 1
-            link_header = response.headers['link']
+            link_header = self.response.headers['link']
             last_page = int(re.findall(r'&page=(\d+)>; rel="last"', link_header)[0])
             with console.status(f"[bold green]Fetching additional repositories..."):
                 while next_page <= last_page:
                     next_url = self.url + f"&page={next_page}"
                     next_response = requests.request(self.method, url=next_url, headers=headers)
+                    self.update_rate_limit_info()
                     next_repo_array = next_response.json()
-                    repositories.extend(next_repo_array)
-
-                    repo_requests_limit = next_response.headers['X-Ratelimit-Limit']
-                    repo_requests_remaining = next_response.headers['X-Ratelimit-Remaining']
-                    repo_requests_used = next_response.headers['X-Ratelimit-Used']
-                    repo_requests_reset = int(next_response.headers['X-Ratelimit-Reset'])
-                    local_time_reset = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(repo_requests_reset))
+                    repositories.extend(next_response.json())
 
                     starting_repo_index = (next_page - 1) * 100
                     completed_range = f"({starting_repo_index} - {starting_repo_index + len(next_repo_array)})"
-                    time.sleep(1)
+                    time.sleep(.2)
                     console.log(f"Success - Fetched Repositories {completed_range}")
                     next_page += 1
 
-            rate_limit_info = f"Request limit: {repo_requests_limit}\n" \
-                              f"Remaining requests: {repo_requests_remaining}\n" \
-                              f"Requests used: {repo_requests_used}\n" \
-                              f"Rate limit resets on: {local_time_reset}\n"
-
-            click.echo(rate_limit_info)
+            if self.rate_limit_verbose:
+                self.display_rate_limit_info()
 
         return repositories
 
     def set_headers(self):
         return {'Authorization': f"Bearer {self.token}"} if self.token else None
+
+    def update_rate_limit_info(self):
+        self.requests_limit = self.response.headers['X-Ratelimit-Limit']
+        self.requests_remaining = self.response.headers['X-Ratelimit-Remaining']
+        self.requests_used = self.response.headers['X-Ratelimit-Used']
+        self.requests_reset = int(self.response.headers['X-Ratelimit-Reset'])
+
+    def display_rate_limit_info(self):
+        local_time_reset = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.requests_reset))
+        rate_limit_info = f"Request limit: {self.requests_limit}\n" \
+                          f"Remaining requests: {self.requests_remaining}\n" \
+                          f"Requests used: {self.requests_used}\n" \
+                          f"Rate limit resets on: {local_time_reset}\n"
+
+        click.echo(rate_limit_info)

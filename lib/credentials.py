@@ -19,6 +19,16 @@ class Credentials:
         self.username_valid = False
         self.personal_access_token_valid = False
 
+    def validate_username(self) -> bool:
+        username_request_helper = RequestHelper(url=build_url('validate_user', username=self.username))
+        username_request_helper.make_request()
+        return username_request_helper.response.status_code == 200
+
+    def validate_personal_access_token(self) -> bool:
+        token_request_helper = RequestHelper(url=build_url('validate_token'), token=self.personal_access_token)
+        token_request_helper.make_request()
+        return token_request_helper.response.status_code == 200
+
     def validate_credentials(self) -> CredentialsType:
         credentials = DBHelper().read_credentials()
         if credentials:
@@ -26,18 +36,14 @@ class Credentials:
             self.personal_access_token = credentials[1]
 
             # check if username is valid
-            username_request_helper = RequestHelper(url=build_url('validate_user', username=self.username))
-            response, json = username_request_helper.request_to_json()
-            self.username_valid = response.status_code == 200
+            self.username_valid = self.validate_username()
 
             # check if token is valid
-            request_helper = RequestHelper(url=build_url('validate_token'), token=self.personal_access_token)
-            response, json = request_helper.request_to_json()
-            self.personal_access_token_valid = response.status_code == 200
+            self.personal_access_token_valid = self.validate_personal_access_token()
 
             if self.username_valid and self.personal_access_token_valid:
                 return True
-            
+
         return False
 
     def display_token_info(self):
@@ -53,11 +59,15 @@ class Credentials:
             click.echo("1. Visit https://github.com/settings/tokens and create a token with 'delete_repo' scope.")
             click.echo("2. Provide your username and token in the prompt below: \n")
 
-    @staticmethod
-    def prompt_user_for_credentials() -> None:
-        prompt = "Update credentials?"
+    def prompt_user_for_credentials(self) -> None:
+        prompt = "Update github credentials?"
         if click.confirm(prompt):
-            username = click.prompt('Username')
-            personal_access_token = click.prompt('Personal Access Token')
+            self.username = click.prompt('Username')
+            if not self.validate_username():
+                return click.echo(click.style('username is invalid. Please try again.', fg='red'))
+            self.personal_access_token = click.prompt('Personal Access Token')
+            if not self.validate_personal_access_token():
+                return click.echo(click.style('token is invalid. Please try again.', fg='red'))
+
             db_helper = DBHelper()
-            db_helper.write_credentials(username, personal_access_token)
+            db_helper.write_credentials(self.username, self.personal_access_token)
