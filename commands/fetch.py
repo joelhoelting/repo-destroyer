@@ -9,7 +9,9 @@ def fetch():
     """Fetch a list of a repos from Github"""
     credentials = Credentials()
     if not credentials.validate_credentials():
-        raise click.ClickException("Invalid credentials. Run 'repo_destroyer authenticate' to update credentials.")
+        raise click.ClickException(
+            click.style("Invalid credentials. Run 'repo_destroyer authenticate' to update credentials.",
+                        fg='bright_red'))
 
     if not Repository.check_repositories_db():
         click.echo("db/repositories.txt is empty or doesn't exist\n")
