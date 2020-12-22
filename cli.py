@@ -1,8 +1,8 @@
 import click
 
 from commands.authenticate import authenticate
-from commands.fetch import fetch
 from commands.destroy import destroy
+from commands.fetch import fetch
 
 
 @click.group()

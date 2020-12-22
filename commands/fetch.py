@@ -6,7 +6,7 @@ from lib.repository import Repository
 
 @click.command()
 def fetch():
-    """Fetch a list of a repos from Github """
+    """Fetch a list of a repos from Github"""
     credentials = Credentials()
     if not credentials.validate_credentials():
         raise click.ClickException("Invalid credentials. Run 'repo_destroyer authenticate' to update credentials.")
