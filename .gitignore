@@ -4,3 +4,4 @@ __pycache__/
 venv/
 
 db/credentials.csv
+db/repositories.txt
