@@ -2,6 +2,7 @@
 *.egg-info/
 __pycache__/
 venv/
+requirements.txt
 
 db/credentials.csv
 db/repositories.txt

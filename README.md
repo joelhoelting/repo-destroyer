@@ -1,8 +1,16 @@
-Repo Destroyer allows you to quickly delete large numbers of GitHub repositories.
+Repo Destroyer is a lightweight tool that allows you to quickly delete large numbers of GitHub repositories.
 
 Installation:
 
 ```
+$ cd repo_destroyer
+
+# Create a virtual environment
+$ "python3 -m venv venv
+
+# Activate virtual environment
+$ . venv/bin/activate"
+
 $ pip install --editable .
 $ repo_destroyer
 ```
