@@ -6,7 +6,8 @@ setup(
     py_modules=['cli'],
     install_requires=[
         'Click',
-        'requests'
+        'requests',
+        'rich'
     ],
     entry_points='''
         [console_scripts]

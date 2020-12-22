@@ -1,4 +1,3 @@
-import click
 from typing import List
 
 from .request_helper import RequestHelper
@@ -11,13 +10,29 @@ class Repository:
     all = []
     db_filepath = 'db/repositories.txt'
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str = None, db_line: int = None):
         self.name = name
 
+    def delete_self(self, username, token):
+        request_helper = RequestHelper(url=build_url('delete_repo', username=username, repository=self.name),
+                                       method='delete',
+                                       token=token,
+                                       rate_limit_verbose=True)
+        response = request_helper.make_request()
+        if response.status_code == 204:
+            DBHelper.delete_repository(self.name)
+            return True
+        else:
+            return False
+
     @classmethod
-    def repositories_db_exists(cls):
-        db_helper = DBHelper()
-        db_repositories = db_helper.read_repositories()
+    def destroy_all(cls):
+        for repo in cls.all:
+            print(repo)
+
+    @classmethod
+    def check_repositories_db(cls):
+        db_repositories = DBHelper.read_repositories()
         if db_repositories:
             cls.all = db_repositories
             return True
@@ -30,9 +45,8 @@ class Repository:
         fetched_repositories = request_helper.fetch_repos()
 
         if fetched_repositories:
-            db_helper = DBHelper()
-            db_helper.write_repositories(Repository.parse_repositories(fetched_repositories))
-            return cls.repositories_db_exists()  # Returns true or false
+            DBHelper.write_repositories(Repository.parse_repositories(fetched_repositories))
+            return cls.check_repositories_db()  # Returns true or false
         return False
 
     @staticmethod

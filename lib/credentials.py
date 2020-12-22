@@ -1,5 +1,4 @@
 import click
-import os.path
 
 from .db_helper import DBHelper
 from .request_helper import RequestHelper
@@ -30,7 +29,7 @@ class Credentials:
         return token_request_helper.response.status_code == 200
 
     def validate_credentials(self) -> CredentialsType:
-        credentials = DBHelper().read_credentials()
+        credentials = DBHelper.read_credentials()
         if credentials:
             self.username = credentials[0]
             self.personal_access_token = credentials[1]
@@ -69,5 +68,4 @@ class Credentials:
             if not self.validate_personal_access_token():
                 return click.echo(click.style('token is invalid. Please try again.', fg='red'))
 
-            db_helper = DBHelper()
-            db_helper.write_credentials(self.username, self.personal_access_token)
+            DBHelper.write_credentials(self.username, self.personal_access_token)

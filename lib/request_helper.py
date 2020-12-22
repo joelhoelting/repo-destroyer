@@ -83,7 +83,7 @@ class RequestHelper:
 
     def display_rate_limit_info(self):
         local_time_reset = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(self.requests_reset))
-        rate_limit_info = f"Request limit: {self.requests_limit}\n" \
+        rate_limit_info = f"\nRequest limit: {self.requests_limit}\n" \
                           f"Remaining requests: {self.requests_remaining}\n" \
                           f"Requests used: {self.requests_used}\n" \
                           f"Rate limit resets on: {local_time_reset}\n"

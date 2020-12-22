@@ -6,6 +6,6 @@ def build_url(key, username="microsoft", repository='invalid'):
         'validate_token': root_url,
         'validate_user': f"{root_url}/users/{username}",
         'list_repos': f"{root_url}/users/{username}/repos?per_page=100",
-        'delete_repos': f"{root_url}/repos/{username}/{repository}"
+        'delete_repo': f"{root_url}/repos/{username}/{repository}"
     }
     return url_dict[key]
