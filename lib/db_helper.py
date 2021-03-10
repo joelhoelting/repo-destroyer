@@ -44,7 +44,7 @@ class DBHelper:
                     if username and personal_access_token:
                         return username, personal_access_token
         else:
-            with open(cls.credentials_filepath, 'w') as f:
+            with open(cls.credentials_filepath, 'w+') as f:
                 writer = csv.DictWriter(f, fieldnames=["username", "personal_access_token"])
                 writer.writeheader()
 

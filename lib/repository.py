@@ -8,7 +8,6 @@ from helpers.url_builder import build_url
 
 class Repository:
     all = []
-    db_filepath = 'db/repositories.txt'
 
     def __init__(self, name: str = None, db_line: int = None):
         self.name = name
