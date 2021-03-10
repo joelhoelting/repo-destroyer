@@ -9,7 +9,7 @@ $ cd repo_destroyer
 $ "python3 -m venv venv
 
 # Activate virtual environment
-$ . venv/bin/activate"
+$ . venv/bin/activate
 
 $ pip install --editable .
 $ repo_destroyer
