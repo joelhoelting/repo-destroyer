@@ -19,7 +19,8 @@ def destroy():
     if click.confirm('Safely delete repos in db/repositories.txt one at a time?'):
         for repository in Repository.all:
             styled_repository_text = click.style(repository, fg='bright_yellow')
-            if click.confirm(f'\nWould you like to delete: {styled_repository_text} ?'):
+            styled_repo_url = click.style(f'https://github.com/joelhoelting/{repository}', fg='blue')
+            if click.confirm(f'\nWould you like to delete: {styled_repository_text} ({styled_repo_url})?'):
                 r = Repository(name=repository)
                 repo_was_deleted = r.delete_self(username=credentials.username, token=credentials.personal_access_token)
                 success_or_error_msg = green_or_red_string(repo_was_deleted, 'successfully deleted',
